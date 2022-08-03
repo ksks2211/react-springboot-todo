@@ -17,5 +17,6 @@ public class ResponseDTO<T> {
     @Getter(value = AccessLevel.NONE)
     protected List<T> data;
 
-    private String error;
+    String error;
+
 }

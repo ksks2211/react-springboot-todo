@@ -1,12 +1,12 @@
-package kr.yoonyeong.server.persistence;
+package kr.yoonyeong.server.repository;
 
-import kr.yoonyeong.server.model.TodoEntity;
+import kr.yoonyeong.server.entity.TodoEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,13 +50,14 @@ class TodoRepositoryTest {
 
         TodoEntity todo = create_entity(userId, title, done);
         todoRepository.save(todo);
+        todoRepository.flush();
 
-        List<TodoEntity> todoEntityList = todoRepository.findByUserId(todo.getUserId());
+        Page<TodoEntity> todoEntityList = todoRepository.findByUserId(todo.getUserId(), Pageable.ofSize(10));
+
+        System.out.println(todoEntityList.getContent());
 
         assertThat(todoEntityList).hasSizeGreaterThan(0);
-        todoEntityList.forEach(el->{
-            assertThat(el.getUserId()).isEqualTo(userId);
-        });
+        todoEntityList.forEach(el-> assertThat(el.getUserId()).isEqualTo(userId));
 
     }
 

@@ -1,11 +1,13 @@
-package kr.yoonyeong.server.model;
+package kr.yoonyeong.server.entity;
 
 import lombok.*;
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.util.Objects;
 
 /**
  * @author rival
@@ -16,7 +18,8 @@ import javax.persistence.Id;
 @AllArgsConstructor
 @Getter
 @Entity
-public class TodoEntity {
+@ToString(callSuper = true)
+public class TodoEntity  extends BaseEntity{
 
     @Id
     @GeneratedValue(generator = "system-uuid")
@@ -36,5 +39,18 @@ public class TodoEntity {
     }
     public void changeTitle(String title){
         this.title=title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        TodoEntity that = (TodoEntity) o;
+        return id != null && Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

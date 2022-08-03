@@ -1,10 +1,12 @@
 package kr.yoonyeong.server.service;
 
 import kr.yoonyeong.server.dto.TodoDTO;
-import kr.yoonyeong.server.model.TodoEntity;
-import kr.yoonyeong.server.persistence.TodoRepository;
+import kr.yoonyeong.server.dto.TodoRequestDTO;
+import kr.yoonyeong.server.entity.TodoEntity;
+import kr.yoonyeong.server.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,8 +40,11 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public List<TodoDTO> retrieve(String userId) {
-        return todoRepository.findByUserId(userId).stream().map(TodoDTO::new).collect(Collectors.toList());
+    public List<TodoDTO> retrieve(final String userId, TodoRequestDTO todoRequestDTO) {
+
+
+        Pageable pageable = todoRequestDTO.getPageable();
+        return todoRepository.findByUserId(userId, pageable).stream().map(TodoDTO::new).collect(Collectors.toList());
     }
 
 
