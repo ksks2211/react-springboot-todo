@@ -19,10 +19,9 @@ public interface TodoRepository extends JpaRepository<TodoEntity,String> {
 
     Page<TodoEntity> findByUserId(String userId, Pageable pageable);
 
-
-
     @Query("select t from TodoEntity t where t.userId = :userId")
-    List<TodoEntity> findByUserIdJPQL(String userId);
+    Page<TodoEntity> findByUserIdJPQL(String userId,Pageable pageable);
 
 
+    Long countByUserId(String userId);
 }

@@ -1,9 +1,9 @@
 package kr.yoonyeong.server.controller;
 
-import kr.yoonyeong.server.annotation.TodoRequestDefault;
+import kr.yoonyeong.server.annotation.TodoListRequestDefault;
 import kr.yoonyeong.server.dto.TodoDTO;
 import kr.yoonyeong.server.dto.TodoListResponseDTO;
-import kr.yoonyeong.server.dto.TodoRequestDTO;
+import kr.yoonyeong.server.dto.TodoListRequestDTO;
 import kr.yoonyeong.server.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +28,11 @@ public class TodoController {
     private final TodoService todoService;
 
     @GetMapping
-    public ResponseEntity<?> retrieveTodoList(@TodoRequestDefault TodoRequestDTO todoRequestDTO){
+    public ResponseEntity<?> retrieveTodoList(@TodoListRequestDefault TodoListRequestDTO todoListRequestDTO){
         String userId = "temporary-user";
 
-        log.info("TodoRequestDTO : {}",todoRequestDTO);
-        List<TodoDTO> todoDTOList = todoService.retrieve(userId,todoRequestDTO);
+        log.info("TodoRequestDTO : {}", todoListRequestDTO);
+        List<TodoDTO> todoDTOList = todoService.retrieve(userId, todoListRequestDTO);
         TodoListResponseDTO body = TodoListResponseDTO.builder()
             .todoDTOList(todoDTOList)
             .build();

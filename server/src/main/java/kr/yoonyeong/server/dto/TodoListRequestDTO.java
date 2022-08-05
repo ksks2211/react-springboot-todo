@@ -14,12 +14,12 @@ import org.springframework.data.domain.Sort;
 @Builder
 @AllArgsConstructor
 @Data
-public class TodoRequestDTO {
+public class TodoListRequestDTO {
 
     private int page;
     private int size;
 
-    public TodoRequestDTO(){
+    public TodoListRequestDTO(){
         this.page=0;
         this.size=10;
     }

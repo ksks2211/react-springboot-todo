@@ -1,7 +1,7 @@
 package kr.yoonyeong.server.resolver;
 
-import kr.yoonyeong.server.annotation.TodoRequestDefault;
-import kr.yoonyeong.server.dto.TodoRequestDTO;
+import kr.yoonyeong.server.annotation.TodoListRequestDefault;
+import kr.yoonyeong.server.dto.TodoListRequestDTO;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -15,10 +15,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
  * @since 2022-08-03
  */
 @Component
-public class TodoRequestDefaultResolver implements HandlerMethodArgumentResolver {
+public class TodoListRequestDefaultResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterAnnotation(TodoRequestDefault.class) != null;
+        return parameter.getParameterAnnotation(TodoListRequestDefault.class) != null;
     }
 
     @Override
@@ -31,16 +31,16 @@ public class TodoRequestDefaultResolver implements HandlerMethodArgumentResolver
             String size = webRequest.getParameter("size");
 
             if(page==null || size == null){
-                return new TodoRequestDTO();
+                return new TodoListRequestDTO();
             }
 
             int p = Integer.parseInt(page);
             int s = Integer.parseInt(size);
-            return new TodoRequestDTO(
+            return new TodoListRequestDTO(
                 p < 1 ? 0 : p-1
                 , Math.max(s, 10));
         }catch(Exception e){
-            return new TodoRequestDTO();
+            return new TodoListRequestDTO();
         }
 
     }

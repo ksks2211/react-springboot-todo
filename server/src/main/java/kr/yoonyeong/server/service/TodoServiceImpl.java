@@ -1,7 +1,7 @@
 package kr.yoonyeong.server.service;
 
 import kr.yoonyeong.server.dto.TodoDTO;
-import kr.yoonyeong.server.dto.TodoRequestDTO;
+import kr.yoonyeong.server.dto.TodoListRequestDTO;
 import kr.yoonyeong.server.entity.TodoEntity;
 import kr.yoonyeong.server.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,10 +40,10 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public List<TodoDTO> retrieve(final String userId, TodoRequestDTO todoRequestDTO) {
+    public List<TodoDTO> retrieve(final String userId, TodoListRequestDTO todoListRequestDTO) {
 
 
-        Pageable pageable = todoRequestDTO.getPageable();
+        Pageable pageable = todoListRequestDTO.getPageable();
         return todoRepository.findByUserId(userId, pageable).stream().map(TodoDTO::new).collect(Collectors.toList());
     }
 

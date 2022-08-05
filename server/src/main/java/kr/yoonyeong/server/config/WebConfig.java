@@ -1,6 +1,6 @@
 package kr.yoonyeong.server.config;
 
-import kr.yoonyeong.server.resolver.TodoRequestDefaultResolver;
+import kr.yoonyeong.server.resolver.TodoListRequestDefaultResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -16,10 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
-    private final TodoRequestDefaultResolver todoRequestDefaultResolver;
+    private final TodoListRequestDefaultResolver todoListRequestDefaultResolver;
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(todoRequestDefaultResolver);
+        resolvers.add(todoListRequestDefaultResolver);
     }
 }

@@ -32,4 +32,6 @@ public class UserEntity extends BaseEntity {
     @Column(nullable=false)
     private String password;
 
+
+
 }

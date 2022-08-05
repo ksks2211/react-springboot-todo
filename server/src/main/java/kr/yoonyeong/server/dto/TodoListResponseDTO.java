@@ -11,7 +11,7 @@ import java.util.List;
 
 
 public class TodoListResponseDTO extends ResponseDTO<TodoDTO>{
-    public List<TodoDTO> getTodos(){
+    public List<TodoDTO> getTodoList(){
         return this.data;
     }
 

@@ -8,6 +8,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
@@ -61,7 +63,27 @@ class TodoRepositoryTest {
 
     }
 
+    @DisplayName("3. countByUserId Test")
+    @Test
+    void test_3(){
 
+        String userId = "user3";
+        String title1 = "Eat Lunch";
+        String title2 = "Eat Dinner";
+
+        boolean done = false;
+        TodoEntity todo1 = create_entity(userId,title1,done);
+        TodoEntity todo2 = create_entity(userId,title2,done);
+
+        List<TodoEntity> todos = List.of(todo1, todo2);
+
+        todoRepository.saveAll(todos);
+        todoRepository.flush();
+
+        Long count = todoRepository.countByUserId(userId);
+
+        assertThat(count).isEqualTo(2);
+    }
 
 
     TodoEntity create_entity(String userId, String title, boolean done){
@@ -71,4 +93,7 @@ class TodoRepositoryTest {
             .done(done)
             .build();
     }
+
+
+
 }
