@@ -2,6 +2,7 @@ package kr.yoonyeong.server.security.entity;
 
 import kr.yoonyeong.server.entity.BaseEntity;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 
@@ -17,11 +18,12 @@ import javax.persistence.*;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"email"})})
-public class UserEntity extends BaseEntity {
+public class Member extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid",strategy = "uuid")
+    private String id;
 
     @Column(nullable = false)
     private String email;
@@ -32,6 +34,7 @@ public class UserEntity extends BaseEntity {
     @Column(nullable=false)
     private String password;
 
-
-
+    @Builder.Default
+    @Column(nullable=false)
+    private String authorities="";
 }

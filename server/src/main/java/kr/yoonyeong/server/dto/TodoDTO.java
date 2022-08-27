@@ -1,6 +1,7 @@
 package kr.yoonyeong.server.dto;
 
 import kr.yoonyeong.server.entity.TodoEntity;
+import kr.yoonyeong.server.security.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,10 +39,10 @@ public class TodoDTO {
 
 
     // mapping dto -> entity
-    public static TodoEntity toEntity(final TodoDTO dto,final String userId){
+    public static TodoEntity toEntity(final TodoDTO dto, final Member member){
         return TodoEntity.builder()
             .id(dto.getId())
-            .userId(userId)
+            .member(member)
             .title(dto.getTitle())
             .done(dto.isDone())
             .build();

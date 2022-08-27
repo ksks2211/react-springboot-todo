@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class ResponseDTO<T> {
+public class ListResponseDTO<T> {
 
     @Getter(value = AccessLevel.NONE)
     protected List<T> data;

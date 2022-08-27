@@ -1,14 +1,11 @@
 package kr.yoonyeong.server.repository;
 
 import kr.yoonyeong.server.entity.TodoEntity;
+import kr.yoonyeong.server.security.entity.Member;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-
-import java.util.List;
 
 /**
  * @author rival
@@ -17,11 +14,11 @@ import java.util.List;
 @Repository
 public interface TodoRepository extends JpaRepository<TodoEntity,String> {
 
-    Page<TodoEntity> findByUserId(String userId, Pageable pageable);
+    Page<TodoEntity> findByMember(Member member, Pageable pageable);
 
-    @Query("select t from TodoEntity t where t.userId = :userId")
-    Page<TodoEntity> findByUserIdJPQL(String userId,Pageable pageable);
+//    @Query("select t from TodoEntity t where t.member = :member")
+//    Page<TodoEntity> findByMemberJPQL(Member member,Pageable pageable);
 
 
-    Long countByUserId(String userId);
+    Long countByMember(Member member);
 }

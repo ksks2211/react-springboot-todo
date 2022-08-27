@@ -10,13 +10,13 @@ import java.util.List;
  */
 
 
-public class TestResponseBodyDTO extends ResponseDTO<String>{
+public class TestListResponseBodyDTO extends ListResponseDTO<String> {
     public List<String> getMessages(){
         return this.data;
     }
 
     @Builder
-    public TestResponseBodyDTO(List<String> data, String error){
+    public TestListResponseBodyDTO(List<String> data, String error){
         super(data,error);
     }
 }

@@ -22,7 +22,7 @@ spring:
       exclude: static/**, public/**
       additional-exclude: java/**, test/**
 server:
-  port: 8080
+  port: 8082
 ---
 spring:
   config:

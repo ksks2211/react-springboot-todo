@@ -1,6 +1,6 @@
 package kr.yoonyeong.server.security.repository;
 
-import kr.yoonyeong.server.security.entity.UserEntity;
+import kr.yoonyeong.server.security.entity.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +26,11 @@ class UserRepositoryTest {
         String username = "username";
         String password="password";
 
-        UserEntity entity = create_entity(email, username, password);
+        Member entity = create_entity(email, username, password);
         
         userRepository.save(entity);
 
-        UserEntity created = userRepository.findById(entity.getId()).get();
+        Member created = userRepository.findById(entity.getId()).get();
 
         assertThat(created).isNotNull();
         assertThat(created.getUsername()).isEqualTo(username);
@@ -48,15 +48,15 @@ class UserRepositoryTest {
 
         userRepository.save(create_entity(email,username,password));
 
-        UserEntity result = userRepository.findByEmail(email);
+        Member result = userRepository.findByEmail(email);
 
         assertThat(result).isNotNull();
         assertThat(result.getUsername()).isEqualTo(username);
         assertThat(result.getPassword()).isEqualTo(password);
     }
     
-    private UserEntity create_entity(String email, String username, String password){
-        return UserEntity.builder()
+    private Member create_entity(String email, String username, String password){
+        return Member.builder()
             .email(email)
             .username(username)
             .password(password)

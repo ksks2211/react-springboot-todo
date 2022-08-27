@@ -4,15 +4,17 @@ import kr.yoonyeong.server.dto.TodoDTO;
 import kr.yoonyeong.server.dto.TodoListRequestDTO;
 import kr.yoonyeong.server.entity.TodoEntity;
 import kr.yoonyeong.server.repository.TodoRepository;
+import kr.yoonyeong.server.security.entity.Member;
+import kr.yoonyeong.server.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -26,55 +28,66 @@ public class TodoServiceImpl implements TodoService {
 
 
     private final TodoRepository todoRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public List<TodoDTO> create(final TodoDTO todoDTO, String userId) {
-
-        TodoEntity entity = TodoDTO.toEntity(todoDTO, userId);
-
+    @Transactional
+    public List<TodoDTO> create(final TodoDTO todoDTO, String userId) throws UsernameNotFoundException{
+        Member member = userRepository
+            .findById(userId)
+            .orElseThrow(
+                ()->new UsernameNotFoundException(userId)
+            );
+        TodoEntity entity = TodoDTO.toEntity(todoDTO, member);
         validateEntity(entity);
-
         TodoDTO dto = new TodoDTO(todoRepository.save(entity));
-
         return List.of(dto);
     }
 
     @Override
-    public List<TodoDTO> retrieve(final String userId, TodoListRequestDTO todoListRequestDTO) {
-
-
+    @Transactional
+    public List<TodoDTO> retrieve(final String userId, TodoListRequestDTO todoListRequestDTO)throws UsernameNotFoundException {
         Pageable pageable = todoListRequestDTO.getPageable();
-        return todoRepository.findByUserId(userId, pageable).stream().map(TodoDTO::new).collect(Collectors.toList());
+        Member member = userRepository
+            .findById(userId)
+            .orElseThrow(
+                ()->new UsernameNotFoundException(userId)
+            );
+        return todoRepository.findByMember(member,pageable).stream().map(TodoDTO::new).collect(Collectors.toList());
     }
 
 
     @Override
     @Transactional
-    public List<TodoDTO> update(final TodoDTO todoDTO, String userId) {
+    public void update(final TodoDTO todoDTO, String userId) throws UsernameNotFoundException,EntityNotFoundException {
+        Member member = userRepository
+            .findById(userId)
+            .orElseThrow(
+                ()->new UsernameNotFoundException(userId)
+            );
+        TodoEntity entity = TodoDTO.toEntity(todoDTO, member);
 
-        TodoEntity entity = TodoDTO.toEntity(todoDTO, userId);
         validateEntity(entity);
-        Optional<TodoEntity> original = todoRepository.findById(entity.getId());
 
-        if(original.isPresent()){
-            TodoEntity changed = original.get();
-            changed.changeState(todoDTO.isDone());
-            changed.changeTitle(todoDTO.getTitle());
-            todoRepository.save(changed);
-            return List.of(new TodoDTO(changed));
-        }
-
-        return Collections.emptyList();
+        TodoEntity changed = todoRepository.findById(entity.getId()).orElseThrow(()->new EntityNotFoundException(todoDTO.getId()));
+        changed.changeState(todoDTO.isDone());
+        changed.changeTitle(todoDTO.getTitle());
+        todoRepository.save(changed);
     }
 
     @Override
-    public void delete(final TodoDTO todoDTO,String userId) {
+    @Transactional
+    public void delete(final TodoDTO todoDTO,String userId) throws UsernameNotFoundException {
 
-        validateEntity(TodoDTO.toEntity(todoDTO,userId));
+        Member member = userRepository
+            .findById(userId)
+            .orElseThrow(
+                ()->new UsernameNotFoundException(userId)
+            );
+        validateEntity(TodoDTO.toEntity(todoDTO,member));
 
         if(todoDTO.getId() == null) return;
         todoRepository.deleteById(todoDTO.getId());
-
     }
 
 
@@ -84,7 +97,7 @@ public class TodoServiceImpl implements TodoService {
             throw new RuntimeException("Entity cannot be null.");
         }
 
-        if(todoEntity.getUserId() == null){
+        if(todoEntity.getMember() == null){
             log.warn("Unknown user.");
             throw new RuntimeException("Unknown user.");
         }

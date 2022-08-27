@@ -10,14 +10,14 @@ import java.util.List;
  */
 
 
-public class TodoListResponseDTO extends ResponseDTO<TodoDTO>{
+public class TodoListListResponseDTO extends ListResponseDTO<TodoDTO> {
     public List<TodoDTO> getTodoList(){
         return this.data;
     }
 
 
     @Builder
-    public TodoListResponseDTO(List<TodoDTO> todoDTOList, String error){
+    public TodoListListResponseDTO(List<TodoDTO> todoDTOList, String error){
         super(todoDTOList,error);
     }
 }

@@ -15,7 +15,7 @@ public interface TodoService {
 
     public List<TodoDTO> retrieve(final String userId, TodoListRequestDTO todoListRequestDTO);
 
-    public List<TodoDTO> update(final TodoDTO todoDTO, String userId);
+    public void update(final TodoDTO todoDTO, String userId);
 
     public void delete(final TodoDTO todoDTO, String userId);
 }

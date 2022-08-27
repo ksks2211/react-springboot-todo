@@ -1,7 +1,7 @@
 package kr.yoonyeong.server.controller;
 
 import kr.yoonyeong.server.dto.TestRequestBodyDTO;
-import kr.yoonyeong.server.dto.TestResponseBodyDTO;
+import kr.yoonyeong.server.dto.TestListResponseBodyDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,25 +41,25 @@ public class TestController {
 
 
     @PostMapping("/body-req")
-    public TestResponseBodyDTO testBodyReqController(@RequestBody TestRequestBodyDTO testRequestBodyDTO){
+    public TestListResponseBodyDTO testBodyReqController(@RequestBody TestRequestBodyDTO testRequestBodyDTO){
         List<String> list = new ArrayList<>();
         list.add("Hello World");
         list.add("Nice to meet you");
         list.add(testRequestBodyDTO.getMessage());
-        return TestResponseBodyDTO.builder()
+        return TestListResponseBodyDTO.builder()
             .data(list)
             .build();
     }
 
 
     @GetMapping("/body-res")
-    public TestResponseBodyDTO testBodyResController(){
+    public TestListResponseBodyDTO testBodyResController(){
         List<String> list = new ArrayList<>();
 
         list.add("Hello World");
         list.add("Nice to meet you");
 
-        return TestResponseBodyDTO.builder()
+        return TestListResponseBodyDTO.builder()
             .data(list)
             .build();
     }
@@ -69,7 +69,7 @@ public class TestController {
         List<String> list = new ArrayList<>();
         list.add("Error Message...");
 
-        TestResponseBodyDTO res = TestResponseBodyDTO.builder()
+        TestListResponseBodyDTO res = TestListResponseBodyDTO.builder()
             .error("Error")
             .data(list)
             .build();

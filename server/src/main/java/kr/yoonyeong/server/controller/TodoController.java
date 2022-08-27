@@ -2,13 +2,15 @@ package kr.yoonyeong.server.controller;
 
 import kr.yoonyeong.server.annotation.TodoListRequestDefault;
 import kr.yoonyeong.server.dto.TodoDTO;
-import kr.yoonyeong.server.dto.TodoListResponseDTO;
+import kr.yoonyeong.server.dto.TodoListListResponseDTO;
 import kr.yoonyeong.server.dto.TodoListRequestDTO;
 import kr.yoonyeong.server.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -24,16 +26,14 @@ import java.util.List;
 @Slf4j
 public class TodoController {
 
-
     private final TodoService todoService;
 
     @GetMapping
-    public ResponseEntity<?> retrieveTodoList(@TodoListRequestDefault TodoListRequestDTO todoListRequestDTO){
-        String userId = "temporary-user";
+    public ResponseEntity<?> retrieveTodoList(@AuthenticationPrincipal User user, @TodoListRequestDefault TodoListRequestDTO todoListRequestDTO){
 
         log.info("TodoRequestDTO : {}", todoListRequestDTO);
-        List<TodoDTO> todoDTOList = todoService.retrieve(userId, todoListRequestDTO);
-        TodoListResponseDTO body = TodoListResponseDTO.builder()
+        List<TodoDTO> todoDTOList = todoService.retrieve(user.getUsername(), todoListRequestDTO);
+        TodoListListResponseDTO body = TodoListListResponseDTO.builder()
             .todoDTOList(todoDTOList)
             .build();
 
@@ -41,69 +41,41 @@ public class TodoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createTodo(@RequestBody TodoDTO todoDTO){
-        try{
-            String userId = "temporary-user";
+    public ResponseEntity<?> createTodo(@AuthenticationPrincipal User user, @RequestBody TodoDTO todoDTO){
 
-            List<TodoDTO> todoDTOList = todoService.create(todoDTO, userId);
-            TodoListResponseDTO body = TodoListResponseDTO.builder()
+        try{
+            List<TodoDTO> todoDTOList = todoService.create(todoDTO, user.getUsername());
+            TodoListListResponseDTO body = TodoListListResponseDTO.builder()
                 .todoDTOList(todoDTOList)
                 .build();
-
             return ResponseEntity.status(HttpStatus.CREATED).body(body);
         } catch (Exception e) {
-
             String error= e.getMessage();
-
-            TodoListResponseDTO responseBody = TodoListResponseDTO.builder()
+            TodoListListResponseDTO responseBody = TodoListListResponseDTO.builder()
                 .error(error)
                 .todoDTOList(Collections.emptyList())
                 .build();
-
             return ResponseEntity.badRequest().body(responseBody);
         }
     }
 
-
     @PutMapping
-    public ResponseEntity<?> updateTodo(@RequestBody TodoDTO todoDTO){
-        String userId = "temporary-user";
-
+    public ResponseEntity<?> updateTodo(@AuthenticationPrincipal User user,@RequestBody TodoDTO todoDTO){
         try{
             if(todoDTO.getId() == null) throw new Exception("Id Needed");
-
-            List<TodoDTO> todoDTOList = todoService.update(todoDTO, userId);
-
-            if(todoDTOList.size()==0) throw new Exception("No Such Id");
-
-            TodoListResponseDTO body = TodoListResponseDTO.builder()
-                .todoDTOList(todoDTOList)
-                .build();
-
-            return ResponseEntity.ok().body(body);
-
+            todoService.update(todoDTO, user.getUsername());
+            return ResponseEntity.ok().build();
         } catch (Exception e) {
-
-            TodoListResponseDTO body = TodoListResponseDTO.builder()
-                .error(e.getMessage())
-                .todoDTOList(Collections.emptyList())
-                .build();
-            return ResponseEntity.badRequest().body(body);
+            return ResponseEntity.badRequest().build();
         }
-
-
     }
 
-
     @DeleteMapping("/{id}")
-    public void deleteTodo(@PathVariable String id){
-        String userId = "temporary-user";
-
+    public void deleteTodo(@AuthenticationPrincipal User user,@PathVariable String id){
         TodoDTO dto = TodoDTO.builder()
             .id(id)
             .build();
-
-        todoService.delete(dto, userId);
+        todoService.delete(dto, user.getUsername());
     }
 
 }

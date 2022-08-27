@@ -1,20 +1,22 @@
 package kr.yoonyeong.server.security.repository;
 
-import kr.yoonyeong.server.security.entity.UserEntity;
+import kr.yoonyeong.server.security.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * @author rival
  * @since 2022-07-24
  */
 @Repository
-public interface UserRepository extends JpaRepository<UserEntity,Long> {
+public interface UserRepository extends JpaRepository<Member,String> {
 
-    UserEntity findByEmail(String email);
+    Optional<Member> findByEmail(String email);
 
     Boolean existsByEmail(String email);
 
-    UserEntity findByEmailAndPassword(String email, String password);
+    Optional<Member> findByEmailAndPassword(String email, String password);
 
 }

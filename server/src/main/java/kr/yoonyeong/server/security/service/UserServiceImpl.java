@@ -1,48 +1,91 @@
 package kr.yoonyeong.server.security.service;
 
-import kr.yoonyeong.server.security.dto.UserDTO;
-import kr.yoonyeong.server.security.entity.UserEntity;
+import kr.yoonyeong.server.exception.NotMatchingPasswordException;
+import kr.yoonyeong.server.security.dto.SignUpForm;
+import kr.yoonyeong.server.security.entity.Member;
 import kr.yoonyeong.server.security.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 /**
  * @author rival
  * @since 2022-08-03
  */
-@Service
 @Slf4j
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public UserDTO create(final UserDTO userDTO) {
+    public User create(SignUpForm signUpForm) {
+        String email = signUpForm.getEmail();
+        String password = new BCryptPasswordEncoder().encode(signUpForm.getPassword());
+        String username = signUpForm.getUsername();
 
-
-
-        if(userDTO == null || userDTO.getEmail() == null){
+        if(!StringUtils.hasText(email) || !StringUtils.hasText(password)){
             throw new RuntimeException("Invalid argument(s)");
         }
 
-        UserEntity userEntity = UserDTO.toEntity(userDTO);
-        final String email = userEntity.getEmail().trim();
+        Member member = Member.builder()
+            .email(email)
+            .password(password)
+            .username(username)
+            .authorities("ROLE_USER")
+            .build();
 
         if(userRepository.existsByEmail(email)){
             log.warn("Email already exists {}",email);
             throw new RuntimeException("Email already exists");
         }
 
-        return UserDTO.toDTO(userRepository.save(userEntity));
+        return toUser(userRepository.save(member));
     }
 
     @Override
-    public UserDTO getByCredentials(final String email, final String password) {
-        UserEntity userEntity = userRepository.findByEmailAndPassword(email, password);
-        return UserDTO.toDTO(userEntity);
+    public User getUserByCredentials(final String email, final String password) throws AuthenticationException {
+
+        Member member = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
+        if(passwordEncoder.matches(password, member.getPassword()))
+            return toUser(member);
+        else throw new NotMatchingPasswordException("Password Not Matching");
     }
+
+    @Override
+    public User getUserByEmail(String email) throws UsernameNotFoundException {
+        Member member = userRepository.findByEmail(email).orElseThrow(()->new UsernameNotFoundException(email));
+        return toUser(member);
+    }
+
+    @Override
+    public User getUserById(String id) throws UsernameNotFoundException {
+        return toUser(userRepository.findById(id).orElseThrow(()->new UsernameNotFoundException(id)));
+    }
+
+
+    @Override
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
+        return getUserByEmail(email);
+    }
+
+    public static User toUser(Member member){
+        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(member.getAuthorities());
+        return new User(member.getId(),member.getPassword(), authorities);
+    }
+
+
 }

@@ -1,12 +1,11 @@
 package kr.yoonyeong.server.entity;
 
+import kr.yoonyeong.server.security.entity.Member;
 import lombok.*;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Objects;
 
 /**
@@ -26,7 +25,10 @@ public class TodoEntity  extends BaseEntity{
     @GenericGenerator(name="system-uuid",strategy = "uuid")
     private String id;
 
-    private String userId;
+
+    @ManyToOne
+    private Member member;
+
     private String title;
     private boolean done;
 
