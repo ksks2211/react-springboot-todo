@@ -11,9 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -34,11 +32,16 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public User create(SignUpForm signUpForm) {
         String email = signUpForm.getEmail();
-        String password = new BCryptPasswordEncoder().encode(signUpForm.getPassword());
+        String password = passwordEncoder.encode(signUpForm.getPassword());
         String username = signUpForm.getUsername();
 
         if(!StringUtils.hasText(email) || !StringUtils.hasText(password)){
             throw new RuntimeException("Invalid argument(s)");
+        }
+
+        if(userRepository.existsByEmail(email)){
+            log.warn("Email already exists {}",email);
+            throw new RuntimeException("Email already exists");
         }
 
         Member member = Member.builder()
@@ -47,11 +50,6 @@ public class UserServiceImpl implements UserService{
             .username(username)
             .authorities("ROLE_USER")
             .build();
-
-        if(userRepository.existsByEmail(email)){
-            log.warn("Email already exists {}",email);
-            throw new RuntimeException("Email already exists");
-        }
 
         return toUser(userRepository.save(member));
     }

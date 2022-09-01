@@ -1,6 +1,7 @@
 package kr.yoonyeong.server.security.config;
 
 import kr.yoonyeong.server.security.filter.JWTAuthenticationFilter;
+import kr.yoonyeong.server.security.filter.JWTLoginFilter;
 import kr.yoonyeong.server.security.repository.UserRepository;
 import kr.yoonyeong.server.security.service.UserService;
 import kr.yoonyeong.server.security.service.UserServiceImpl;
@@ -16,6 +17,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
@@ -54,8 +56,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.httpBasic();
 
-        // authentication filter
         http.addFilterAt(jwtAuthenticationFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAt(jwtLoginFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }
 
@@ -67,6 +69,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     JWTAuthenticationFilter jwtAuthenticationFilter() throws Exception {
         return new JWTAuthenticationFilter(authenticationManager(),userService());
+    }
+
+    @Bean
+    JWTLoginFilter jwtLoginFilter() throws Exception {
+        return new JWTLoginFilter("/auth/sign-in",authenticationManager());
     }
 
     @Bean
